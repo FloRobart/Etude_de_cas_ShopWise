@@ -11,6 +11,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
       - shopwise-net
+    ports:
+      - ${DB_PORT:-}:5432
     volumes:
       - shopwise_data:/var/lib/postgresql
     healthcheck:
@@ -19,36 +21,38 @@ services:
       timeout: 30s
       retries: 5
 
-  # shopwise-server:
-  #   image: shopwise-server:latest
-  #   build:
-  #     context: ./api
-  #     dockerfile: Dockerfile
-  #   working_dir: /app
-  #   restart: always
-  #   env_file: .env
-  #   depends_on:
-  #     shopwise-db:
-  #       condition: service_healthy
-  #   networks:
-  #     - shopwise-net
-  #   ports:
-  #     - ${APP_PORT:-}:80
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   cap_drop:
-  #     - ALL
-  #   cap_add:
-  #     - NET_BIND_SERVICE
-  #   read_only: true
-  #   user: "1800:1800"
-  #   tmpfs:
-  #     - /tmp:exec,nosuid,nodev
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "wget -q --spider http://shopwise-server:80/ || exit 1"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
+  shopwise-api:
+    image: shopwise-api:latest
+    build:
+      context: ./api/shopwise
+      dockerfile: Dockerfile
+    working_dir: /app
+    restart: always
+    env_file: .env
+    environment:
+      SERVER_PORT: 80
+    depends_on:
+      shopwise-db:
+        condition: service_healthy
+    networks:
+      - shopwise-net
+    ports:
+      - ${APP_PORT:-}:80
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    user: "1800:1800"
+    tmpfs:
+      - /tmp:exec,nosuid,nodev
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://shopwise-api:80/healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   shopwise_data:
