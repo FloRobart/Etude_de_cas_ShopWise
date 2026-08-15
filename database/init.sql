@@ -1,7 +1,7 @@
 CREATE TABLE clients (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nom VARCHAR(100) NOT NULL,
-    prenom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100),
     email VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(15),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -31,6 +31,7 @@ CREATE TABLE fidelisation (
     commercant_id INTEGER NOT NULL,
     points INTEGER DEFAULT 0,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(id),
     FOREIGN KEY (commercant_id) REFERENCES commercants(id)
 );
@@ -41,6 +42,7 @@ CREATE TABLE transactions (
     commercant_id INTEGER NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(id),
     FOREIGN KEY (commercant_id) REFERENCES commercants(id)
 );
