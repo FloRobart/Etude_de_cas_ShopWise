@@ -2,60 +2,58 @@ package fr.florobart.shopwise.modules.commercants;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import fr.florobart.shopwise.modules.clients.Client;
 
 @RestController
 @RequestMapping("/commercants")
 public class CommercantController {
 
-    private final CommercantService commercantService;
+    private final CommercantService service;
 
     /**
      * Constructor for ClientController
      * @param commercantService The service injected by Spring
      */
     public CommercantController(CommercantService commercantService) {
-        this.commercantService = commercantService;
+        this.service = commercantService;
     }
 
     @GetMapping
     public List<Commercant> getAll() {
-        try {
-            return commercantService.getAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while fetching clients", e);
-        }
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Commercant> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping
-    public void create() {
-        try {
-            // Logic to create a new user
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while fetching clients", e);
-        }
+    public ResponseEntity<Commercant> create(@RequestBody Commercant commercant) {
+        Commercant createdCommercant = service.create(commercant);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCommercant);
     }
 
-    @PutMapping
-    public void update() {
-        try {
-            // Logic to update a user
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while fetching clients", e);
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<Commercant> update(@PathVariable Long id, @RequestBody Commercant commercant) {
+        Commercant updatedCommercant = service.update(id, commercant);
+        return ResponseEntity.ok(updatedCommercant);
     }
 
-    @DeleteMapping
-    public void delete() {
-        try {
-            // Logic to delete a user
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while fetching clients", e);
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
