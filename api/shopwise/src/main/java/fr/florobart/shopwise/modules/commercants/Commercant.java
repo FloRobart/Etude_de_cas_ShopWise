@@ -17,6 +17,13 @@ public class Commercant {
     @Column(name = "nom", nullable = false)
     private String nom;
 
+    public Commercant() {}
+
+    public Commercant(Long id, String nom) {
+        this.id = id;
+        this.nom = nom;
+    }
+
     /*=========*/
     /* Getters */
     /*=========*/

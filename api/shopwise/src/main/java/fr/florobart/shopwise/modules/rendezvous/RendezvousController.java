@@ -1,4 +1,4 @@
-package fr.florobart.shopwise.modules.clients;
+package fr.florobart.shopwise.modules.rendezvous;
 
 import java.util.List;
 
@@ -14,44 +14,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/clients")
-public class ClientController {
+@RequestMapping("/rendez-vous")
+public class RendezvousController {
 
-    private final ClientService clientService;
+    private final RendezvousService service;
 
     /**
      * Constructor for ClientController
-     * @param clientService The service injected by Spring
+     * @param rendezvousService The service injected by Spring
      */
-    public ClientController(ClientService clientService) {
-        this.clientService = clientService;
+    public RendezvousController(RendezvousService rendezvousService) {
+        this.service = rendezvousService;
     }
 
     @GetMapping
-    public List<Client> getAll() {
-        return clientService.getAll();
+    public List<Rendezvous> getAll() {
+        try {
+            return service.getAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while fetching clients", e);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(clientService.getById(id));
+    public ResponseEntity<Rendezvous> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Client> create(@RequestBody Client client) {
-        Client createdClient = clientService.create(client);
+    public ResponseEntity<Rendezvous> create(@RequestBody Rendezvous client) {
+        Rendezvous createdClient = service.create(client);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody Client client) {
-        Client updatedClient = clientService.update(id, client);
+    public ResponseEntity<Rendezvous> update(@PathVariable Long id, @RequestBody Rendezvous client) {
+        Rendezvous updatedClient = service.update(id, client);
         return ResponseEntity.ok(updatedClient);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        clientService.delete(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

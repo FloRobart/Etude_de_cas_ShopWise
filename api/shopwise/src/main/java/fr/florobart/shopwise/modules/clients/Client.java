@@ -35,13 +35,9 @@ public class Client {
         this.phone = phone;
     }
 
-    public Client(Long id, String nom, String prenom, String email) {
-        this(id, nom, prenom, email, null);
-    }
-
     /*=========*/
- /* Getters */
- /*=========*/
+    /* Getters */
+    /*=========*/
     public Long getId() {
         return id;
     }
@@ -63,8 +59,8 @@ public class Client {
     }
 
     /*=========*/
- /* Setters */
- /*=========*/
+    /* Setters */
+    /*=========*/
     public void setId(Long id) {
         this.id = id;
     }
