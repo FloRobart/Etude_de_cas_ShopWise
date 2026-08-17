@@ -27,6 +27,8 @@ public class Rendezvous {
     private String serviceType;
     @Column(name = "status", nullable = false)
     private String status;
+    @Column(name = "fidelity_points", nullable = true)
+    private int fidelityPoints;
 
     public Rendezvous() {}
 
@@ -37,6 +39,7 @@ public class Rendezvous {
         this.appointmentDate = appointmentDate;
         this.serviceType = serviceType;
         this.status = status;
+        this.fidelityPoints = 0;
     }
 
     /*=========*/
@@ -66,6 +69,10 @@ public class Rendezvous {
         return status;
     }
 
+    public int getFidelityPoints() {
+        return fidelityPoints;
+    }
+
     /*=========*/
     /* Setters */
     /*=========*/
@@ -91,5 +98,9 @@ public class Rendezvous {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setFidelityPoints(int fidelityPoints) {
+        this.fidelityPoints = fidelityPoints;
     }
 }

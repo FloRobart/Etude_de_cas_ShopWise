@@ -27,18 +27,25 @@ public class RendezvousService {
                 .orElseThrow(() -> new RuntimeException("Client introuvable avec l'ID : " + id));
     }
 
-    public Rendezvous create(Rendezvous client) {
-        client.setId(null);
-        return repository.save(client);
+    public Rendezvous create(Rendezvous rendezvous) {
+        rendezvous.setId(null);
+        rendezvous.setStatus(rendezvous.getStatus().toLowerCase());
+        return repository.save(rendezvous);
     }
 
-    public Rendezvous update(Long id, Rendezvous clientDetails) {
+    public Rendezvous update(Long id, Rendezvous rendezvous) {
+        // Add automatica
+        if (rendezvous.getStatus().toLowerCase().equals("completed")) {
+            rendezvous.setFidelityPoints(rendezvous.getFidelityPoints() + 10);
+        }
+
         Rendezvous client = getById(id);
-        client.setClientId(clientDetails.getClientId());
-        client.setCommercantId(clientDetails.getCommercantId());
-        client.setAppointmentDate(clientDetails.getAppointmentDate());
-        client.setServiceType(clientDetails.getServiceType());
-        client.setStatus(clientDetails.getStatus());
+        client.setClientId(rendezvous.getClientId());
+        client.setCommercantId(rendezvous.getCommercantId());
+        client.setAppointmentDate(rendezvous.getAppointmentDate());
+        client.setServiceType(rendezvous.getServiceType());
+        client.setStatus(rendezvous.getStatus().toLowerCase());
+        client.setFidelityPoints(rendezvous.getFidelityPoints());
         return repository.save(client);
     }
 
