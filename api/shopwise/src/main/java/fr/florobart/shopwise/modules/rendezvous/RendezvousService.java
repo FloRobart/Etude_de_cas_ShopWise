@@ -27,6 +27,22 @@ public class RendezvousService {
                 .orElseThrow(() -> new RuntimeException("Client introuvable avec l'ID : " + id));
     }
 
+    public List<Rendezvous> getByCommercantId(Long id) {
+        try {
+            return repository.findByCommercantId(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des rezndez-vous avec l'ID de commerçant : " + id, e);
+        }
+    }
+
+    public List<Rendezvous> getByClientId(Long id) {
+        try {
+            return repository.findByClientId(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des rezndez-vous avec l'ID de client : " + id, e);
+        }
+    }
+
     public Rendezvous create(Rendezvous rendezvous) {
         rendezvous.setId(null);
         rendezvous.setStatus(rendezvous.getStatus().toLowerCase());

@@ -23,6 +23,8 @@ public class Client {
     private String email;
     @Column(name = "phone", nullable = true)
     private String phone;
+    @Column(name = "hash_password", nullable = true)
+    private String hashPassword;
 
     public Client() {
     }
@@ -58,6 +60,10 @@ public class Client {
         return phone;
     }
 
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
     /*=========*/
     /* Setters */
     /*=========*/
@@ -79,5 +85,9 @@ public class Client {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public void setHashPassword(String hashPassword) {
+        this.hashPassword = hashPassword;
     }
 }

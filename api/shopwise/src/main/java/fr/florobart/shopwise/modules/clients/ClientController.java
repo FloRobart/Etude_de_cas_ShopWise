@@ -1,5 +1,6 @@
 package fr.florobart.shopwise.modules.clients;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.hash.Hashing;
 
 @RestController
 @RequestMapping("/clients")
@@ -37,10 +40,26 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getById(id));
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Client> getByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(clientService.getByEmail(email));
+    }
+
     @PostMapping
     public ResponseEntity<Client> create(@RequestBody Client client) {
         Client createdClient = clientService.create(client);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Client> login(@RequestBody Client client) {
+        Client existingClient = clientService.getById(client.getId());
+        String sha256hex = Hashing.sha256().hashString(client.getHashPassword(), StandardCharsets.UTF_8).toString();
+        if (existingClient != null && existingClient.getHashPassword().equals(sha256hex)) {
+            return ResponseEntity.ok(existingClient);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PutMapping("/{id}")

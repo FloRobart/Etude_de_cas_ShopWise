@@ -41,6 +41,16 @@ public class RendezvousController {
         return ResponseEntity.ok(service.getById(id));
     }
 
+    @GetMapping("/commercants/{id}")
+    public ResponseEntity<List<Rendezvous>> getByCommercantId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getByCommercantId(id));
+    }
+
+    @GetMapping("/clients/{id}")
+    public ResponseEntity<List<Rendezvous>> getByClientId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getByClientId(id));
+    }
+
     @PostMapping
     public ResponseEntity<Rendezvous> create(@RequestBody Rendezvous client) {
         Rendezvous createdClient = service.create(client);
