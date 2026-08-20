@@ -1,0 +1,107 @@
+<main class="login-wrapper">
+  <div class="login-card">
+    <header class="card-header">
+      <a routerLink="/" class="back-link">&larr; Accueil</a>
+      <h1>Espace Client</h1>
+      <p class="subtitle">
+        @switch (step()) {
+          @case ('email') { Entrez votre email pour commencer }
+          @case ('set-password') { Première connexion : définissez votre mot de passe }
+          @case ('enter-password') { Bonjour {{ currentClient()?.prenom || currentClient()?.nom }}, entrez votre mot de passe }
+        }
+      </p>
+    </header>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+    @if (success()) {
+      <div class="alert alert-success">{{ success() }}</div>
+    }
+
+    <!-- Étape 1 : Email -->
+    @if (step() === 'email') {
+      <form [formGroup]="emailForm" (ngSubmit)="onCheckEmail()" class="login-form">
+        <div class="form-group">
+          <label for="email">Adresse email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Ex : jean.dupont@example.com"
+            [class.input-invalid]="emailForm.get('email')?.invalid && emailForm.get('email')?.touched"
+          />
+          @if (emailForm.get('email')?.touched && emailForm.get('email')?.hasError('required')) {
+            <span class="field-error">L'email est requis.</span>
+          }
+          @if (emailForm.get('email')?.touched && emailForm.get('email')?.hasError('email')) {
+            <span class="field-error">Format d'email invalide.</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="emailForm.invalid || loading()">
+          @if (loading()) { Vérification... } @else { Continuer }
+        </button>
+      </form>
+    }
+
+    <!-- Étape 2a : Définir un mot de passe -->
+    @if (step() === 'set-password') {
+      <form [formGroup]="setPasswordForm" (ngSubmit)="onSetPassword()" class="login-form">
+        <div class="user-badge">
+          <span>Compte : <strong>{{ currentClient()?.email }}</strong></span>
+          <button type="button" class="link-btn" (click)="resetFlow()">Changer</button>
+        </div>
+
+        <div class="form-group">
+          <label for="new-password">Nouveau mot de passe</label>
+          <input
+            id="new-password"
+            type="password"
+            formControlName="password"
+            placeholder="Minimum 6 caractères"
+            [class.input-invalid]="setPasswordForm.get('password')?.invalid && setPasswordForm.get('password')?.touched"
+          />
+          @if (setPasswordForm.get('password')?.touched && setPasswordForm.get('password')?.hasError('required')) {
+            <span class="field-error">Le mot de passe est obligatoire.</span>
+          }
+          @if (setPasswordForm.get('password')?.touched && setPasswordForm.get('password')?.hasError('minlength')) {
+            <span class="field-error">Le mot de passe doit comporter au moins 6 caractères.</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="setPasswordForm.invalid || loading()">
+          @if (loading()) { Enregistrement... } @else { Créer le mot de passe }
+        </button>
+      </form>
+    }
+
+    <!-- Étape 2b : Se connecter avec son mot de passe -->
+    @if (step() === 'enter-password') {
+      <form [formGroup]="loginPasswordForm" (ngSubmit)="onLogin()" class="login-form">
+        <div class="user-badge">
+          <span>Compte : <strong>{{ currentClient()?.email }}</strong></span>
+          <button type="button" class="link-btn" (click)="resetFlow()">Changer</button>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Mot de passe</label>
+          <input
+            id="login-password"
+            type="password"
+            formControlName="password"
+            placeholder="Votre mot de passe"
+            [class.input-invalid]="loginPasswordForm.get('password')?.invalid && loginPasswordForm.get('password')?.touched"
+          />
+          @if (loginPasswordForm.get('password')?.touched && loginPasswordForm.get('password')?.hasError('required')) {
+            <span class="field-error">Veuillez renseigner votre mot de passe.</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="loginPasswordForm.invalid || loading()">
+          @if (loading()) { Connexion... } @else { Se connecter }
+        </button>
+      </form>
+    }
+  </div>
+</main>
