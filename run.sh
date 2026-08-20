@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Ce script permet de lancer/mettre à jour la version dockerisée de la documentation
+# Ce script permet de lancer/mettre à jour la version dockerisée de l'application Shopwise.
 # Usage :
-#   - Pour lancer la documentation : ./run.sh
-#   - Pour mettre à jour la documentation : ./run.sh
+#   - Pour lancer l'application : ./run.sh
+#   - Pour mettre à jour l'application : ./run.sh
 
 docker compose -f docker-compose.yml up -d --force-recreate --build
