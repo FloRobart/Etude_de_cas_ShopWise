@@ -23,6 +23,8 @@ ShopWise est une application web de digitalisation des commerces de proximité.
 
 ## Launching the application
 
+Copy file `.env.example` in file `.env`.
+
 execute `run.sh` to launch the application in a Docker container. The script will build the Docker image and start the container.
 
 ## Insert test data
@@ -36,3 +38,4 @@ Client with password :
 ## Stop the application
 
 execute `stop.sh` to stop the application and remove the Docker container.
+
