@@ -1,0 +1,77 @@
+name: Test, build and publish Docker images
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set lowercase repository variables
+        id: repo_meta
+        run: |
+          owner_lc="${GITHUB_REPOSITORY_OWNER,,}"
+          repo_name="${GITHUB_REPOSITORY#*/}"
+          repo_name_clean=$(echo "$repo_name" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+          echo "owner=$owner_lc" >> $GITHUB_OUTPUT
+          echo "repo=$repo_name_clean" >> $GITHUB_OUTPUT
+
+      - name: Get API version from pom.xml
+        id: vars
+        run: |
+          cd api/shopwise
+          version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build & Push Database
+      - name: Build and push database (GHCR)
+        uses: docker/build-push-action@v6
+        with:
+          context: database
+          file: database/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.repo_meta.outputs.owner }}/${{ steps.repo_meta.outputs.repo }}-db:${{ steps.vars.outputs.version }}
+            ghcr.io/${{ steps.repo_meta.outputs.owner }}/${{ steps.repo_meta.outputs.repo }}-db:latest
+
+      # Build & Push API
+      - name: Build and push API (GHCR)
+        uses: docker/build-push-action@v6
+        with:
+          context: api/shopwise
+          file: api/shopwise/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.repo_meta.outputs.owner }}/${{ steps.repo_meta.outputs.repo }}-api:${{ steps.vars.outputs.version }}
+            ghcr.io/${{ steps.repo_meta.outputs.owner }}/${{ steps.repo_meta.outputs.repo }}-api:latest
+
+      # Build & Push Interface Angular
+      - name: Build and push Interface (GHCR)
+        uses: docker/build-push-action@v6
+        with:
+          context: interface/shopwise-app
+          file: interface/shopwise-app/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.repo_meta.outputs.owner }}/${{ steps.repo_meta.outputs.repo }}-interface:${{ steps.vars.outputs.version }}
+            ghcr.io/${{ steps.repo_meta.outputs.owner }}/${{ steps.repo_meta.outputs.repo }}-interface:latest
