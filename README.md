@@ -1,5 +1,7 @@
 # ShopWise
 
+Github repository : [https://github.com/FloRobart/Etude_de_cas_ShopWise](https://github.com/FloRobart/Etude_de_cas_ShopWise)
+
 ## Table des matières
 
 - [ShopWise](#shopwise)
