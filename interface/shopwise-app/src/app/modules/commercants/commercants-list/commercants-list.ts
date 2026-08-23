@@ -1,12 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 import { Commercant } from '../commercants.model';
 import { CommercantsService } from '../commercants.service';
 
 @Component({
   selector: 'app-commercants-list',
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink],
   templateUrl: './commercants-list.html',
   styleUrl: './commercants-list.css',
 })
