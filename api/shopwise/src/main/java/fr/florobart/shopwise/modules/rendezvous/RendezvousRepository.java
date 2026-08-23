@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RendezvousRepository extends JpaRepository<Rendezvous, Long> {
+    List<Rendezvous> findByCommercantId(Long commercantId);
 
-    // 1. Méthode dérivée (génère: SELECT * FROM products WHERE name ILIKE %:name%)
-    List<Rendezvous> findByCommercantIdContainingIgnoreCase(Long commercantId);
+    List<Rendezvous> findByClientId(Long clientId);
 }

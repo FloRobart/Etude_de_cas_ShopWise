@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    // 1. Méthode dérivée (génère: SELECT * FROM products WHERE name ILIKE %:name%)
     List<Client> findByNomContainingIgnoreCase(String nom);
+
+    Client findByEmail(String email);
 }

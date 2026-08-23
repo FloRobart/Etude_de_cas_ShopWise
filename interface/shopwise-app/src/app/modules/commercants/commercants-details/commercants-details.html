@@ -1,0 +1,281 @@
+<div class="page-container">
+  <header class="header-nav">
+    <a routerLink="/commercants" class="back-link">&larr; Retour aux commerçants</a>
+    <h1>Détails du Commerçant #{{ id() }}</h1>
+  </header>
+
+  <main class="content-grid">
+    <!-- Colonne de gauche : Rendez-vous & Nouveau Rendez-vous -->
+    <div class="left-column">
+      <!-- Formulaire Nouveau Rendez-vous -->
+      <section class="card">
+        <div class="card-header">
+          <h2>Planifier un Rendez-vous</h2>
+          <p class="subtitle">Créer un nouveau créneau pour ce commerçant</p>
+        </div>
+
+        @if (rdvSuccess()) {
+          <div class="alert alert-success">{{ rdvSuccess() }}</div>
+        }
+        @if (rdvError()) {
+          <div class="alert alert-error">{{ rdvError() }}</div>
+        }
+
+        <form [formGroup]="rdvForm" (ngSubmit)="onSubmitRdv()" class="form-container">
+          <div class="form-group">
+            <label for="clientId">Client <span class="required">*</span></label>
+            <select
+              id="clientId"
+              formControlName="clientId"
+              [class.input-invalid]="rdvForm.get('clientId')?.invalid && rdvForm.get('clientId')?.touched"
+            >
+              <option [ngValue]="null" disabled>Sélectionner un client...</option>
+              @for (c of clients(); track c.id ?? c.email) {
+                <option [ngValue]="c.id">
+                  {{ c.prenom }} {{ c.nom }} ({{ c.email }})
+                </option>
+              }
+            </select>
+            @if (rdvForm.get('clientId')?.touched && rdvForm.get('clientId')?.hasError('required')) {
+              <span class="field-error">Veuillez sélectionner un client.</span>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appointmentDate">Date & Heure <span class="required">*</span></label>
+              <input
+                id="appointmentDate"
+                type="datetime-local"
+                formControlName="appointmentDate"
+                [class.input-invalid]="rdvForm.get('appointmentDate')?.invalid && rdvForm.get('appointmentDate')?.touched"
+              />
+              @if (rdvForm.get('appointmentDate')?.touched && rdvForm.get('appointmentDate')?.hasError('required')) {
+                <span class="field-error">La date et l'heure sont requises.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="serviceType">Type de prestation</label>
+              <input
+                id="serviceType"
+                type="text"
+                formControlName="serviceType"
+                placeholder="Ex: Entretien, Coupe, Conseil"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="status">Statut initial</label>
+              <select id="status" formControlName="status">
+                <option value="scheduled">Planifié (scheduled)</option>
+                <option value="completed">Terminé (completed)</option>
+                <option value="canceled">Annulé (canceled)</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="rdvForm.invalid || isSubmittingRdv()">
+            @if (isSubmittingRdv()) {
+              Création du rendez-vous...
+            } @else {
+              Planifier le rendez-vous
+            }
+          </button>
+        </form>
+      </section>
+
+      <!-- Liste des Rendez-vous prévus -->
+      <section class="card">
+        <div class="card-header">
+          <h2>Rendez-vous prévus</h2>
+          <span class="clients-count">{{ data().length }} RDV</span>
+        </div>
+
+        @if (loading()) {
+          <div class="state-box">
+            <span class="spinner"></span>
+            <p>Chargement des rendez-vous...</p>
+          </div>
+        }
+
+        @if (error()) {
+          <div class="state-box alert-error">
+            <p>{{ error() }}</p>
+          </div>
+        }
+
+        @if (!loading() && !error()) {
+          @if (data().length === 0) {
+            <div class="state-box empty-state">
+              <p>Aucun rendez-vous planifié pour ce commerçant.</p>
+            </div>
+          } @else {
+            <ul class="rdv-list">
+              @for (item of data(); track item.id) {
+                <li class="rdv-item">
+                  <div class="rdv-info">
+                    <span class="rdv-badge">RDV #{{ item.id }} (Client #{{ item.clientId }})</span>
+                    <strong>{{ item.serviceType || 'Prestation' }}</strong>
+                    <span class="rdv-date">{{ item.appointmentDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="rdv-meta">
+                    <button
+                      type="button"
+                      class="status-btn"
+                      [class]="(item.status || 'scheduled').toLowerCase()"
+                      [disabled]="updatingRdvIds().has(item.id)"
+                      (click)="cycleStatus(item)"
+                      title="Cliquer pour changer le statut"
+                    >
+                      @if (updatingRdvIds().has(item.id)) {
+                        ...
+                      } @else {
+                        {{ item.status || 'scheduled' }}
+                      }
+                    </button>
+                    <span class="fidelity-tag">+{{ item.fidelityPoints || 0 }} pts</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        }
+      </section>
+    </div>
+
+    <!-- Colonne de droite : Formulaire + Liste des Clients -->
+    <div class="right-column">
+      <!-- Section Formulaire Client -->
+      <section class="card">
+        <div class="card-header">
+          <h2>{{ selectedClient() ? 'Modifier le Client' : 'Nouveau Client' }}</h2>
+          <p class="subtitle">
+            {{ selectedClient() ? 'Mettre à jour les informations du client sélectionné' : 'Enregistrer un client' }}
+          </p>
+        </div>
+
+        @if (clientSuccess()) {
+          <div class="alert alert-success">{{ clientSuccess() }}</div>
+        }
+        @if (clientError()) {
+          <div class="alert alert-error">{{ clientError() }}</div>
+        }
+
+        <form [formGroup]="clientForm" (ngSubmit)="onSubmitClient()" class="form-container">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nom">Nom <span class="required">*</span></label>
+              <input
+                id="nom"
+                type="text"
+                formControlName="nom"
+                placeholder="Ex: Dupont"
+                [class.input-invalid]="clientForm.get('nom')?.invalid && clientForm.get('nom')?.touched"
+              />
+              @if (clientForm.get('nom')?.touched && clientForm.get('nom')?.hasError('required')) {
+                <span class="field-error">Le nom est obligatoire.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="prenom">Prénom</label>
+              <input id="prenom" type="text" formControlName="prenom" placeholder="Ex: Jean" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="Ex: jean.dupont@example.com"
+              [class.input-invalid]="clientForm.get('email')?.invalid && clientForm.get('email')?.touched"
+            />
+            @if (clientForm.get('email')?.touched && clientForm.get('email')?.hasError('required')) {
+              <span class="field-error">L'adresse email est requise.</span>
+            }
+            @if (clientForm.get('email')?.touched && clientForm.get('email')?.hasError('email')) {
+              <span class="field-error">Veuillez renseigner un format email valide.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Téléphone</label>
+            <input id="phone" type="tel" formControlName="phone" placeholder="Ex: 06 12 34 56 78" />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="clientForm.invalid || isSubmittingClient()">
+              @if (isSubmittingClient()) {
+                {{ selectedClient() ? 'Modification en cours...' : 'Création en cours...' }}
+              } @else {
+                {{ selectedClient() ? 'Enregistrer les modifications' : 'Ajouter le client' }}
+              }
+            </button>
+
+            @if (selectedClient()) {
+              <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+                Annuler
+              </button>
+            }
+          </div>
+        </form>
+      </section>
+
+      <!-- Section Liste des Clients -->
+      <section class="card clients-card">
+        <div class="card-header">
+          <h2>Clients enregistrés</h2>
+          <span class="clients-count">{{ clients().length }} client(s)</span>
+        </div>
+
+        @if (clientsLoading()) {
+          <div class="state-box">
+            <span class="spinner"></span>
+            <p>Chargement des clients...</p>
+          </div>
+        }
+
+        @if (clientsError()) {
+          <div class="state-box alert-error">
+            <p>{{ clientsError() }}</p>
+          </div>
+        }
+
+        @if (!clientsLoading() && !clientsError()) {
+          @if (clients().length === 0) {
+            <div class="state-box empty-state">
+              <p>Aucun client trouvé.</p>
+            </div>
+          } @else {
+            <ul class="clients-list">
+              @for (c of clients(); track c.id ?? c.email) {
+                <li
+                  class="client-item"
+                  [class.selected]="selectedClient()?.id === c.id"
+                  (click)="selectClient(c)"
+                  title="Cliquer pour modifier ce client ou le sélectionner pour un RDV"
+                >
+                  <div class="client-avatar">
+                    {{ (c.prenom ? c.prenom[0] : '') + (c.nom ? c.nom[0] : '') | uppercase }}
+                  </div>
+                  <div class="client-details">
+                    <strong class="client-name">{{ c.prenom }} {{ c.nom }}</strong>
+                    <span class="client-email">{{ c.email }}</span>
+                    @if (c.phone) {
+                      <span class="client-phone">{{ c.phone }}</span>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        }
+      </section>
+    </div>
+  </main>
+</div>

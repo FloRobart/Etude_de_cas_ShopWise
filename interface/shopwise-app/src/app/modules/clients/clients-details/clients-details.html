@@ -1,0 +1,62 @@
+<div class="client-rdv-container">
+  <!-- En-tête avec compteur et total fidélité -->
+  <header class="header-card">
+    <div>
+      <h1>Rendez-vous du Client #{{ id() }}</h1>
+      <p class="subtitle">Historique et gestion des points fidélité</p>
+    </div>
+
+    <!-- Badge Total des Points -->
+    <div class="fidelity-card">
+      <span class="fidelity-label">Points de fidélité</span>
+      <strong class="fidelity-total">{{ totalFidelityPoints() }} pts</strong>
+    </div>
+  </header>
+
+  <!-- État de chargement -->
+  @if (loading()) {
+    <div class="state-box">
+      <span class="spinner"></span>
+      <p>Chargement des rendez-vous en cours...</p>
+    </div>
+  }
+
+  <!-- État d'erreur -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  <!-- Liste des rendez-vous -->
+  @if (!loading() && !error()) {
+    @if (appointments().length === 0) {
+      <div class="state-box empty-state">
+        <p>Aucun rendez-vous trouvé pour ce client.</p>
+      </div>
+    } @else {
+      <ul class="rdv-list">
+        @for (rdv of appointments(); track rdv.id) {
+          <li class="rdv-card">
+            <div class="rdv-main">
+              <div class="rdv-header">
+                <span class="rdv-badge">RDV #{{ rdv.id }}</span>
+                <span class="status-tag" [class]="rdv.status.toLowerCase()">
+                  {{ rdv.status }}
+                </span>
+              </div>
+              <strong class="service-name">{{ rdv.serviceType || 'Prestation standard' }}</strong>
+              <span class="rdv-date">
+                📅 {{ rdv.appointmentDate | date:'EEEE dd MMMM yyyy à HH:mm' }}
+              </span>
+            </div>
+
+            <div class="rdv-points">
+              <span class="points-badge">+{{ rdv.fidelityPoints || 0 }} pts</span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

@@ -1,0 +1,21 @@
+<div class="container">
+  <h2>Liste des Commercants</h2>
+
+  @if (loading()) {
+    <p>Chargement des commercants depuis l'API...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!loading() && !error()) {
+    <ul>
+      @for (item of data(); track $index) {
+        <li>
+          <a [routerLink]="['/commercants', item.id]">{{ item.nom }}</a>
+        </li>
+      }
+    </ul>
+  }
+</div>

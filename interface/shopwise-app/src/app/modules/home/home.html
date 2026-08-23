@@ -1,0 +1,26 @@
+<!-- src/app/modules/home/home.html -->
+<main class="home-container">
+  <header class="home-header">
+    <div class="brand-badge">Shopwise</div>
+    <h1>Bienvenue sur votre plateforme</h1>
+    <p class="subtitle">Sélectionnez votre espace pour continuer</p>
+  </header>
+
+  <section class="portal-grid">
+    <!-- Espace Commerçant -->
+    <a routerLink="/commercants" class="portal-card merchant-card">
+      <div class="card-icon">🏪</div>
+      <h2>Espace Commerçant</h2>
+      <p>Gérez vos rendez-vous, suivez vos clients et administrez votre activité.</p>
+      <span class="cta-link">Accéder à mon espace &rarr;</span>
+    </a>
+
+    <!-- Espace Client -->
+    <a routerLink="/clients/login" class="portal-card client-card">
+      <div class="card-icon">👤</div>
+      <h2>Espace Client</h2>
+      <p>Consultez vos rendez-vous, vos points de fidélité et vos commerçants partenaires.</p>
+      <span class="cta-link">Accéder à mon espace &rarr;</span>
+    </a>
+  </section>
+</main>
