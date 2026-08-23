@@ -1,6 +1,9 @@
 services:
   shopwise-db:
-    image: ghcr.io/florobart/etude-de-cas-shopwise-db:latest
+    image: shopwise-db:latest
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
@@ -19,7 +22,10 @@ services:
       retries: 5
 
   shopwise-api:
-    image: ghcr.io/florobart/etude-de-cas-shopwise-api:latest
+    image: shopwise-api:latest
+    build:
+      context: ./api/shopwise
+      dockerfile: Dockerfile
     working_dir: /app
     restart: always
     env_file: .env
@@ -50,7 +56,10 @@ services:
       retries: 5
 
   shopwise-app:
-    image: ghcr.io/florobart/etude-de-cas-shopwise-interface:latest
+    image: shopwise-app:latest
+    build:
+      context: ./interface/shopwise-app
+      dockerfile: Dockerfile
     restart: always
     depends_on:
       shopwise-api:
